@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <assert.h>
 
+#define DOT_PRODUCT(a, b) ((a[0]*b[0])+(a[1]*b[1])+(a[2]*b[2]))
+#define SUB_VECTOR(a, b, c) (c[0]=a[0]-b[0], c[1]=a[1]-b[1], c[2]=a[2]-b[2])
+
 static inline
 void normalize(double *v)
 {
@@ -32,8 +35,12 @@ void add_vector(const double *a, const double *b, double *out)
 static inline
 void subtract_vector(const double *a, const double *b, double *out)
 {
-    for (int i = 0; i < 3; i++)
-        out[i] = a[i] - b[i];
+	//old method
+    //for (int i = 0; i < 3; i++)
+    //    out[i] = a[i] - b[i];
+	out[0] = a[0] - b[0];
+	out[1] = a[1] - b[1];
+	out[2] = a[2] - b[2];
 }
 
 static inline
@@ -62,8 +69,10 @@ static inline
 double dot_product(const double *v1, const double *v2)
 {
     double dp = 0.0;
-    for (int i = 0; i < 3; i++)
-        dp += v1[i] * v2[i];
+	//old method
+    //for (int i = 0; i < 3; i++)
+    //    dp += v1[i] * v2[i];
+	dp = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
     return dp;
 }
 
