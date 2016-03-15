@@ -347,7 +347,8 @@ static unsigned int ray_color(const point3 e, double t,
                               const rectangular_node rectangulars,
                               const sphere_node spheres,
                               const light_node lights,
-                              color object_color, int bounces_left)
+                              color object_color, int bounces_left,
+							  int* count)
 {
     rectangular_node hit_rec = NULL, light_hit_rec = NULL;
     sphere_node hit_sphere = NULL, light_hit_sphere = NULL;
@@ -362,13 +363,12 @@ static unsigned int ray_color(const point3 e, double t,
         SET_COLOR(object_color, 0.0, 0.0, 0.0);
         return 0;
     }
-
+	(*count)++;
     /* check for intersection with a sphere or a rectangular */
     intersection ip= ray_hit_object(e, d, t, MAX_DISTANCE, rectangulars,
                                     &hit_rec, spheres, &hit_sphere);
     if (!hit_rec && !hit_sphere)
         return 0;
-
     /* pick the fill of the object that was hit */
     fill = hit_rec ?
            hit_rec->element.rectangular_fill :
@@ -390,6 +390,7 @@ static unsigned int ray_color(const point3 e, double t,
         ray_hit_object(ip.point, _l, MIN_DISTANCE, length(l),
                        rectangulars, &light_hit_rec,
                        spheres, &light_hit_sphere);
+		(*count)++;
         /* the light was not block by itself(lit object) */
         if (light_hit_rec || light_hit_sphere)
             continue;
@@ -426,7 +427,7 @@ static unsigned int ray_color(const point3 e, double t,
         int old_top = stk->top;
         if (ray_color(ip.point, MIN_DISTANCE, r, stk, rectangulars, spheres,
                       lights, reflection_part,
-                      bounces_left - 1)) {
+                      bounces_left - 1,count)) {
             multiply_vector(reflection_part, R * (1.0 - fill.Kd) * fill.R,
                             reflection_part);
             add_vector(object_color, reflection_part,
@@ -440,7 +441,7 @@ static unsigned int ray_color(const point3 e, double t,
         normalize(rr);
         if (ray_color(ip.point, MIN_DISTANCE, rr, stk,rectangulars, spheres,
                       lights, refraction_part,
-                      bounces_left - 1)) {
+                      bounces_left - 1,count)) {
             multiply_vector(refraction_part, (1 - R) * fill.T,
                             refraction_part);
             add_vector(object_color, refraction_part,
@@ -465,6 +466,8 @@ void raytracing(uint8_t *pixels, color background_color,
     calculateBasisVectors(u, v, w, view);
 
     idx_stack stk;
+	int *count = malloc(sizeof(int));
+	int maxCount = 0;
 
     int factor = sqrt(SAMPLES);
     for (int j = 0; j < height; j++) {
@@ -478,10 +481,11 @@ void raytracing(uint8_t *pixels, color background_color,
                                 j * factor + s % factor,
                                 view,
                                 width * factor, height * factor);
+				*count=0;
                 if (ray_color(view->vrp, 0.0, d, &stk, rectangulars, spheres,
                               lights, object_color,
-                              MAX_REFLECTION_BOUNCES)) {
-                    r += object_color[0];
+                              MAX_REFLECTION_BOUNCES,count)) {                    
+					r += object_color[0];
                     g += object_color[1];
                     b += object_color[2];
                 } else {
@@ -489,9 +493,10 @@ void raytracing(uint8_t *pixels, color background_color,
                     g += background_color[1];
                     b += background_color[2];
                 }
-                pixels[((i + (j * width)) * 3) + 0] = r * 255 / SAMPLES;
-                pixels[((i + (j * width)) * 3) + 1] = g * 255 / SAMPLES;
-                pixels[((i + (j * width)) * 3) + 2] = b * 255 / SAMPLES;
+                //pixels[((i + (j * width)) * 3) + 0] = r * 255 / SAMPLES;
+                //pixels[((i + (j * width)) * 3) + 1] = g * 255 / SAMPLES;
+                //pixels[((i + (j * width)) * 3) + 2] = b * 255 / SAMPLES;
+				pixels[((i + (j * width)) * 3) + 0] = 255*(*count) / 13;
             }
         }
     }
