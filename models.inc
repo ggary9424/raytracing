@@ -66,6 +66,8 @@ rectangular rectangular1 = {
         .Kd = 0.8, .Ks = 0.0, .T = 0.0, .R = 0.5,
         .index_of_refraction = 0.0, .phong_power = 5.0,
     },
+	.e01 = {  0.0, 0.0, 20.0 }, 
+	.e03 = {  20.0, 0.0, 0.0 },
 };
 
 static const
@@ -82,6 +84,8 @@ rectangular rectangular2 = {
         .Kd = 0.8, .Ks = 0.0, .T = 0.0, .R = 0.5,
         .index_of_refraction = 0.0, .phong_power = 5.0,
     },
+	.e01 = {  20.0, 0.0, 0.0 }, 
+	.e03 = {  0.0, 20.0, 0.0 },
 };
 
 static const
@@ -98,4 +102,6 @@ rectangular rectangular3 = {
         .Kd = 0.8, .Ks = 0.0, .T = 0.0, .R = 0.5,
         .index_of_refraction = 0.0, .phong_power = 5.0,
     },
+	.e01 = {  0.0, 20.0, 0.0 }, 
+	.e03 = { 0.0,  0.0, 20.0 },
 };

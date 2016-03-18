@@ -6,7 +6,13 @@ CC ?= gcc
 CFLAGS = \
 	-std=gnu99 -Wall -mavx -O0 -g 
 LDFLAGS = \
-	-lm
+	-lm -lpthread
+
+ifeq ($(strip $(INLINE)),1)
+INLINE_FLAGS = -D__forceinline="__attribute__((always_inline))"
+CFLAGS += $(INLINE_FLAGS)
+LDFLAGS += $(INLINE_FLAGS) 
+endif
 
 ifeq ($(strip $(INLINE)), 1)
 INLINE_FLAGS = -D__forceinline="__attribute__((always_inline))"
@@ -21,6 +27,7 @@ LDFLAGS += $(PROF_FLAGS)
 endif
 
 OBJS := \
+	make-spiral.o\
 	objects.o \
 	raytracing.o \
 	main.o

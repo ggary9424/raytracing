@@ -31,6 +31,8 @@ typedef struct {
     point3 vertices[4];
     point3 normal;
     object_fill rectangular_fill;
+    point3 e01;
+    point3 e03;
 } rectangular;
 
 typedef struct {
