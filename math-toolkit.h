@@ -30,9 +30,9 @@ void add_vector(const double *a, const double *b, double *out)
 {
     //for (int i = 0; i < 3; i++)
     //    out[i] = a[i] + b[i];
-	out[0] = a[0] + b[0];
-	out[1] = a[1] + b[1];
-	out[2] = a[2] + b[2];
+    out[0] = a[0] + b[0];
+    out[1] = a[1] + b[1];
+    out[2] = a[2] + b[2];
 }
 
 static inline __forceinline
@@ -51,9 +51,9 @@ void multiply_vectors(const double *a, const double *b, double *out)
 {
     //for (int i = 0; i < 3; i++)
     //    out[i] = a[i] * b[i];
-	out[0] = a[0] * b[0];
-	out[1] = a[1] * b[1];
-	out[2] = a[2] * b[2];
+    out[0] = a[0] * b[0];
+    out[1] = a[1] * b[1];
+    out[2] = a[2] * b[2];
 }
 
 static inline __forceinline
@@ -61,9 +61,9 @@ void multiply_vector(const double *a, double b, double *out)
 {
     //for (int i = 0; i < 3; i++)
     //    out[i] = a[i] * b;
-	out[0] = a[0] * b;
-	out[1] = a[1] * b;
-	out[2] = a[2] * b;
+    out[0] = a[0] * b;
+    out[1] = a[1] * b;
+    out[2] = a[2] * b;
 }
 
 static inline __forceinline

@@ -39,8 +39,8 @@ for (int i = 0; i < 4; i++)
 {
     COPY_POINT3(newNode->element.vertices[i], X->vertices[i]);
     COPY_POINT3(newNode->element.normal, X->normal);
-	/*    new adding   */	
-	COPY_POINT3(newNode->element.e01, X->e01);
+    /*    new adding   */
+    COPY_POINT3(newNode->element.e01, X->e01);
     COPY_POINT3(newNode->element.e03, X->e03);
 }
 FUNC_END(rectangular)

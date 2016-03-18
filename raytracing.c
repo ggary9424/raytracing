@@ -13,7 +13,7 @@
 #define MIN_DISTANCE 0.001
 #define SAMPLES 4
 #define THREADNUM 10
-#define SPIRAL_SZIE 10
+//#define SPIRAL_SZIE 10
 
 #define SQUARE(x) (x * x)
 #define MAX(a, b) (a > b ? a : b)
@@ -21,6 +21,7 @@
 /* @param t t distance
  * @return 1 means hit, otherwise 0
  */
+//pthread_mutex_t mutex;
 static int raySphereIntersection(const point3 ray_e,
                                  const point3 ray_d,
                                  const sphere *sph,
@@ -56,7 +57,7 @@ static int rayRectangularIntersection(const point3 ray_e,
                                       rectangular *rec,
                                       intersection *ip, double *t1)
 {
-	point3 p;
+    point3 p;
     //point3 e01, e03, p;
     //SUB_VEC(rec->vertices[1], rec->vertices[0], e01);
     //SUB_VEC(rec->vertices[3], rec->vertices[0], e03);
@@ -426,11 +427,11 @@ static unsigned int ray_color(const point3 e, double t,
     /* totalColor = localColor +
                     mix((1-fill.Kd) * fill.R * reflection, T * refraction, R)
      */
-	/*if (bounces_left-1 == 0) {
-		protect_color_overflow(object_color);
+    /*if (bounces_left-1 == 0) {
+    	protect_color_overflow(object_color);
         return 1;
-   	}
-	*/
+    }
+    */
     if (fill.R > 0) {
         /* if we hit something, add the color */
         int old_top = stk->top;
@@ -464,43 +465,52 @@ static unsigned int ray_color(const point3 e, double t,
 
 static void *thread_compute_color(void *arg_)
 {
-	const THR_ARG *arg = (const THR_ARG *)arg_;
+    const THR_ARG *arg = (const THR_ARG *)arg_;
     point3 d;
     idx_stack stk;
     color object_color = { 0.0, 0.0, 0.0 };
-	//map_wh* mp = arg->mp;
-	//while(mp != NULL){
-		for (int j = arg->height_start; j < arg->height_end; j+=THREADNUM) {
-		    for (int i = 0; i < (arg->same)->width; i++) {
-		//for (int j = mp->height_start; j < mp->height_start+arg->addNum; j++) {
-		    //for (int i = mp->width_start; i < mp->width_start+arg->addNum; i++) {
-		        double r = 0, g = 0, b = 0;
-		        for (int s = 0; s < SAMPLES; s++) {
-		            idx_stack_init(&stk);
-		            rayConstruction(d, (arg->same)->u, (arg->same)->v, (arg->same)->w,
-		                            i **((arg->same)->factor) + s / *((arg->same)->factor),
-		                            j **((arg->same)->factor) + s % *((arg->same)->factor),
-		                            (arg->same)->view,
-		                            (arg->same)->width * (*((arg->same)->factor)), (arg->same)->height * (*((arg->same)->factor)));
-		            if (ray_color(((arg->same)->view)->vrp, 0.0, d, &stk, (arg->same)->rectangulars, (arg->same)->spheres,
-		                          (arg->same)->lights, object_color,
-		                          MAX_REFLECTION_BOUNCES)) {
-		                r += object_color[0];
-		                g += object_color[1];
-		                b += object_color[2];
-		            } else {
-		                r += ((arg->same)->background_color)[0];
-		                g += ((arg->same)->background_color)[1];
-		                b += ((arg->same)->background_color)[2];
-		            }
-		            ((arg->same)->pixels)[((i + (j * (arg->same)->width)) * 3) + 0] = r * 255 / SAMPLES;
-		            ((arg->same)->pixels)[((i + (j * (arg->same)->width)) * 3) + 1] = g * 255 / SAMPLES;
-		            ((arg->same)->pixels)[((i + (j * (arg->same)->width)) * 3) + 2] = b * 255 / SAMPLES;
-		        }
-		    }
-		}
-	//	mp = mp->next;
-	//}
+    //map_wh* mp = arg->mp;
+    //while(mp != NULL){
+    /*
+    int j;
+    while(current < (arg->same)->height){
+    	j = current;
+    	pthread_mutex_lock(&mutex);
+    	current = current+1;
+    	pthread_mutex_unlock(&mutex);
+    */
+    for (int j = arg->height_start; j < arg->height_end; j+=THREADNUM) {
+        for (int i = 0; i < (arg->same)->width; i++) {
+            //for (int j = mp->height_start; j < mp->height_start+arg->addNum; j++) {
+            //for (int i = mp->width_start; i < mp->width_start+arg->addNum; i++) {
+            double r = 0, g = 0, b = 0;
+            for (int s = 0; s < SAMPLES; s++) {
+                idx_stack_init(&stk);
+                rayConstruction(d, (arg->same)->u, (arg->same)->v, (arg->same)->w,
+                                i **((arg->same)->factor) + s / *((arg->same)->factor),
+                                j **((arg->same)->factor) + s % *((arg->same)->factor),
+                                (arg->same)->view,
+                                (arg->same)->width * (*((arg->same)->factor)), (arg->same)->height * (*((arg->same)->factor)));
+                if (ray_color(((arg->same)->view)->vrp, 0.0, d, &stk, (arg->same)->rectangulars, (arg->same)->spheres,
+                              (arg->same)->lights, object_color,
+                              MAX_REFLECTION_BOUNCES)) {
+                    r += object_color[0];
+                    g += object_color[1];
+                    b += object_color[2];
+                } else {
+                    r += ((arg->same)->background_color)[0];
+                    g += ((arg->same)->background_color)[1];
+                    b += ((arg->same)->background_color)[2];
+                }
+                ((arg->same)->pixels)[((i + (j * (arg->same)->width)) * 3) + 0] = r * 255 / SAMPLES;
+                ((arg->same)->pixels)[((i + (j * (arg->same)->width)) * 3) + 1] = g * 255 / SAMPLES;
+                ((arg->same)->pixels)[((i + (j * (arg->same)->width)) * 3) + 2] = b * 255 / SAMPLES;
+            }
+        }
+    }
+    //	mp = mp->next;
+    //}
+    //}
     return NULL;
 }
 
@@ -511,35 +521,36 @@ static void parallelCompute(uint8_t *pixels, double* background_color,
 {
 
     pthread_t id[THREADNUM];
-	THR_ARG_THE_SAME *arg_same = malloc(sizeof(THR_ARG_THE_SAME));
+    THR_ARG_THE_SAME *arg_same = malloc(sizeof(THR_ARG_THE_SAME));
     THR_ARG *arg[THREADNUM];
     void *ret;
-	//map_wh* spiral_head[THREADNUM];
-	//make_spiral_array(spiral_head, width, height, SPIRAL_SZIE, THREADNUM);
-	
-	arg_same = malloc(sizeof(THR_ARG_THE_SAME));
-	arg_same->pixels = pixels;
-	arg_same->background_color = background_color;
-	arg_same->rectangulars = rectangulars;
-	arg_same->spheres = spheres;
-	arg_same->lights = lights;
-	arg_same->view = view;
-	arg_same->width = width;
-	arg_same->height = height;
-	arg_same->u = u;
-	arg_same->v = v;
-	arg_same->w = w;
-	arg_same->factor = factor;
+    //map_wh* spiral_head[THREADNUM];
+    //make_spiral_array(spiral_head, width, height, SPIRAL_SZIE, THREADNUM);
 
+    arg_same = malloc(sizeof(THR_ARG_THE_SAME));
+    arg_same->pixels = pixels;
+    arg_same->background_color = background_color;
+    arg_same->rectangulars = rectangulars;
+    arg_same->spheres = spheres;
+    arg_same->lights = lights;
+    arg_same->view = view;
+    arg_same->width = width;
+    arg_same->height = height;
+    arg_same->u = u;
+    arg_same->v = v;
+    arg_same->w = w;
+    arg_same->factor = factor;
+
+    current = 0;
     for(int i=0; i<THREADNUM; i++) {
         arg[i] = malloc(sizeof(THR_ARG));
-		arg[i]->same = arg_same;
-		//arg[i]->mp = spiral_head[i];  //spiral
-		//arg[i]->addNum = (512/SPIRAL_SZIE)+1;  //spiral
-		arg[i]->height_start = i;
+        arg[i]->same = arg_same;
+        //arg[i]->mp = spiral_head[i];  //spiral
+        //arg[i]->addNum = (512/SPIRAL_SZIE)+1;  //spiral
+        arg[i]->height_start = i;
         arg[i]->height_end = height;
-		//arg[i]->height_start = i*height/THREADNUM;  //column
-		//arg[i]->height_end = (i+1)*height/THREADNUM;  //column
+        //arg[i]->height_start = i*height/THREADNUM;  //column
+        //arg[i]->height_end = (i+1)*height/THREADNUM;  //column
     }
 
     for(int i=0; i<THREADNUM; i++) {
