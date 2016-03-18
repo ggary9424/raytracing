@@ -8,6 +8,12 @@ CFLAGS = \
 LDFLAGS = \
 	-lm -lpthread
 
+ifeq ($(strip $(INLINE)),1)
+INLINE_FLAGS = -D__forceinline="__attribute__((always_inline))"
+CFLAGS += $(INLINE_FLAGS)
+LDFLAGS += $(INLINE_FLAGS) 
+endif
+
 ifeq ($(strip $(PROFILE)),1)
 PROF_FLAGS = -pg
 CFLAGS += $(PROF_FLAGS)
@@ -15,6 +21,7 @@ LDFLAGS += $(PROF_FLAGS)
 endif
 
 OBJS := \
+	make-spiral.o\
 	objects.o \
 	raytracing.o \
 	main.o
