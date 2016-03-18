@@ -33,6 +33,8 @@ typedef struct {
     object_fill rectangular_fill;
     point3 e01;
     point3 e03;
+    point3 e23;
+    point3 e21;
 } rectangular;
 
 typedef struct {

@@ -22,6 +22,8 @@ typedef struct thread_arg_the_same {
 typedef struct thread_arg {
 
     THR_ARG_THE_SAME *same;
+    //map_wh * mp;
+    //int addNum;
     int height_start;
     int height_end;
 } THR_ARG;

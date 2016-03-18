@@ -87,6 +87,7 @@ static int rayRectangularIntersection(const point3 ray_e,
 
     if (alpha + beta > 1.0f) {
         /* for the second triangle */
+        point3 rec->e23, rec->e21;
         cross_product(ray_d, rec->e21, p);
 
         det = DOT(rec->e23, p);
@@ -418,10 +419,10 @@ static unsigned int ray_color(const point3 e, double t,
                     mix((1-fill.Kd) * fill.R * reflection, T * refraction, R)
      */
     if (bounces_left-1 == 0) {
-        protect_color_overflow(object_color);
+    	protect_color_overflow(object_color);
         return 1;
     }
-
+    
     if (fill.R > 0) {
         /* if we hit something, add the color */
         int old_top = stk->top;

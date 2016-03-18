@@ -42,6 +42,8 @@ for (int i = 0; i < 4; i++)
     /*    new adding   */
     COPY_POINT3(newNode->element.e01, X->e01);
     COPY_POINT3(newNode->element.e03, X->e03);
+    COPY_POINT3(newNode->element.e23, X->e23);
+    COPY_POINT3(newNode->element.e21, X->e21);
 }
 FUNC_END(rectangular)
 
